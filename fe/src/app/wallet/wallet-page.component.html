@@ -1,0 +1,371 @@
+<div class="page">
+
+  <header class="header">
+
+    <div>
+      <h1>
+        {{ t('title') }}
+      </h1>
+
+      <p
+        class="player"
+        *ngIf="wallet"
+      >
+        {{ wallet.username }}
+      </p>
+    </div>
+
+    <div class="language">
+
+      <label>
+        {{ t('language') }}
+      </label>
+
+      <select
+        [ngModel]="i18n.language()"
+        (ngModelChange)="changeLanguage($event)"
+      >
+        <option value="en">
+          English
+        </option>
+
+        <option value="bg">
+          Български
+        </option>
+      </select>
+
+    </div>
+
+    <div class="header-actions">
+
+      <div class="language">
+
+        <label>
+          {{ t('language') }}
+        </label>
+
+        <select
+          [ngModel]="i18n.language()"
+          (ngModelChange)="changeLanguage($event)"
+        >
+          <option value="en">
+            English
+          </option>
+
+          <option value="bg">
+            Български
+          </option>
+        </select>
+
+      </div>
+
+      <button
+        type="button"
+        (click)="logout()"
+      >
+        {{ t('logout') }}
+      </button>
+
+    </div>
+
+  </header>
+
+
+  <div
+    *ngIf="errorMessage"
+    class="message error"
+  >
+    {{ errorMessage }}
+  </div>
+
+
+  <div
+    *ngIf="successMessage"
+    class="message success"
+  >
+    {{ successMessage }}
+  </div>
+
+
+  <div
+    *ngIf="loading && !wallet"
+    class="loading"
+  >
+    {{ t('loading') }}
+  </div>
+
+
+  <ng-container *ngIf="wallet">
+
+    <section class="balance-grid">
+
+      <article class="card">
+        <span>
+          {{ t('realBalance') }}
+        </span>
+
+        <strong>
+          {{ wallet.realBalance | currency:'EUR' }}
+        </strong>
+      </article>
+
+
+      <article class="card">
+        <span>
+          {{ t('bonusBalance') }}
+        </span>
+
+        <strong>
+          {{ wallet.bonusBalance | currency:'EUR' }}
+        </strong>
+      </article>
+
+
+      <article class="card">
+        <span>
+          {{ t('totalBalance') }}
+        </span>
+
+        <strong>
+          {{ wallet.totalBalance | currency:'EUR' }}
+        </strong>
+      </article>
+
+    </section>
+
+
+    <section class="panel">
+
+      <h2>
+        {{ t('bonusProgress') }}
+      </h2>
+
+      <ng-container *ngIf="bonus?.active; else noBonus">
+
+        <div class="progress">
+
+          <div
+            class="progress-value"
+            [style.width.%]="bonus?.progressPercent"
+          ></div>
+
+        </div>
+
+        <div class="bonus-details">
+
+          <span>
+            {{ t('wageringCompleted') }}:
+            {{ bonus?.wageringCompleted | currency:'EUR' }}
+          </span>
+
+          <span>
+            {{ t('wageringRemaining') }}:
+            {{ bonus?.wageringRemaining | currency:'EUR' }}
+          </span>
+
+          <span>
+            {{ bonus?.progressPercent }}%
+          </span>
+
+        </div>
+
+        <p>
+          {{ t('expiresAt') }}:
+          {{ bonus?.expiresAt | date:'medium' }}
+        </p>
+
+      </ng-container>
+
+
+      <ng-template #noBonus>
+        <p>
+          {{ t('noActiveBonus') }}
+        </p>
+      </ng-template>
+
+    </section>
+
+
+    <section class="actions-grid">
+
+      <form
+        class="panel"
+        (ngSubmit)="createDeposit()"
+      >
+
+        <h2>
+          {{ t('deposit') }}
+        </h2>
+
+        <label>
+          {{ t('depositAmount') }}
+        </label>
+
+        <input
+          type="number"
+          min="0.01"
+          step="0.01"
+          name="depositAmount"
+          [(ngModel)]="depositAmount"
+          required
+        >
+
+        <button
+          type="submit"
+          [disabled]="actionLoading"
+        >
+          {{ t('createDeposit') }}
+        </button>
+
+      </form>
+
+
+      <form
+        class="panel"
+        (ngSubmit)="placeBet()"
+      >
+
+        <h2>
+          {{ t('playRound') }}
+        </h2>
+
+        <label>
+          {{ t('stake') }}
+        </label>
+
+        <input
+          type="number"
+          min="0.01"
+          step="0.01"
+          name="stake"
+          [(ngModel)]="stake"
+          required
+        >
+
+        <button
+          type="submit"
+          [disabled]="actionLoading"
+        >
+          {{ t('placeBet') }}
+        </button>
+
+      </form>
+
+    </section>
+
+
+    <section
+      class="panel"
+      *ngIf="lastRoundWin !== null"
+    >
+
+      <h2>
+        {{ t('roundResult') }}
+      </h2>
+
+      <p *ngIf="lastRoundWin > 0">
+        {{ t('roundWin') }}:
+        {{ lastRoundWin | currency:'EUR' }}
+      </p>
+
+      <p *ngIf="lastRoundWin === 0">
+        {{ t('roundLoss') }}
+      </p>
+
+    </section>
+
+
+    <section class="panel ledger">
+
+      <h2>
+        {{ t('ledger') }}
+      </h2>
+
+      <div class="table-wrapper">
+
+        <table>
+
+          <thead>
+          <tr>
+            <th>{{ t('type') }}</th>
+            <th>{{ t('realChange') }}</th>
+            <th>{{ t('bonusChange') }}</th>
+            <th>{{ t('realAfter') }}</th>
+            <th>{{ t('bonusAfter') }}</th>
+            <th>{{ t('date') }}</th>
+          </tr>
+          </thead>
+
+          <tbody>
+
+          <tr
+            *ngFor="
+                let entry
+                of ledger?.content
+              "
+          >
+
+            <td>
+              {{ ledgerTypeLabel(entry.type) }}
+            </td>
+
+            <td>
+              {{ entry.realChange | currency:'EUR' }}
+            </td>
+
+            <td>
+              {{ entry.bonusChange | currency:'EUR' }}
+            </td>
+
+            <td>
+              {{ entry.realBalanceAfter | currency:'EUR' }}
+            </td>
+
+            <td>
+              {{ entry.bonusBalanceAfter | currency:'EUR' }}
+            </td>
+
+            <td>
+              {{ entry.createdAt | date:'short' }}
+            </td>
+
+          </tr>
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+
+      <div class="pagination">
+
+        <button
+          type="button"
+          (click)="previousPage()"
+          [disabled]="ledger?.first"
+        >
+          {{ t('previous') }}
+        </button>
+
+        <span>
+          {{ (ledger?.page ?? 0) + 1 }}
+          /
+          {{ ledger?.totalPages || 1 }}
+        </span>
+
+        <button
+          type="button"
+          (click)="nextPage()"
+          [disabled]="ledger?.last"
+        >
+          {{ t('next') }}
+        </button>
+
+      </div>
+
+    </section>
+
+  </ng-container>
+
+</div>

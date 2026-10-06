@@ -1,0 +1,15 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: casino-wallet-postgres
+    environment:
+      POSTGRES_DB: casino_wallet
+      POSTGRES_USER: casino
+      POSTGRES_PASSWORD: casino
+    ports:
+      - "5432:5432"
+    volumes:
+      - casino_wallet_pgdata:/var/lib/postgresql/data
+
+volumes:
+  casino_wallet_pgdata:

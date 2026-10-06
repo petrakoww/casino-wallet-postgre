@@ -1,0 +1,57 @@
+<div class="login-page">
+
+  <div class="login-card">
+
+    <h1>
+      {{ t('title') }}
+    </h1>
+
+    <p>
+      {{ t('loginDescription') }}
+    </p>
+
+    <form
+      (ngSubmit)="login()"
+    >
+
+      <label for="username">
+        {{ t('username') }}
+      </label>
+
+      <input
+        id="username"
+        name="username"
+        type="text"
+        [(ngModel)]="username"
+        minlength="2"
+        maxlength="100"
+        required
+        autocomplete="off"
+      >
+
+      <button
+        type="submit"
+        [disabled]="loading || !username.trim()"
+      >
+        {{ loading
+        ? t('loading')
+        : t('login')
+        }}
+      </button>
+
+    </form>
+
+    <div
+      class="error"
+      *ngIf="errorMessage"
+    >
+      {{ errorMessage }}
+    </div>
+
+    <p class="hint">
+      {{ t('loginHint') }}
+    </p>
+
+  </div>
+
+</div>

@@ -1,0 +1,27 @@
+spring:
+  application:
+    name: casino-wallet
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/casino_wallet
+    username: casino
+    password: casino
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        jdbc:
+          time_zone: UTC
+
+  flyway:
+    enabled: true
+
+server:
+  port: 8080
+
+wallet:
+  payment-provider:
+    hmac-secret: development-secret-change-me
